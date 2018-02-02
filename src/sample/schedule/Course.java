@@ -24,12 +24,24 @@ public class Course {
     @SerializedName("section_list")
     private Section[] sections;
 
+    private transient ArrayList<String> requiredSections;
+
     public Course(Course other) {
         this.name = other.name;
         this.description = other.description;
         this.creditHours = other.creditHours;
         this.genEdReqs = other.genEdReqs;
         this.sections = new Section[0];
+        this.requiredSections = new ArrayList<>();
+    }
+
+    public void addRequiredSection(String newSection) {
+        if (requiredSections != null) {
+            requiredSections.add(newSection);
+        }else{
+            requiredSections = new ArrayList<>();
+            requiredSections.add(newSection);
+        }
     }
 
     @Override
@@ -89,5 +101,13 @@ public class Course {
 
     public void setSectionTypes(String[] sectionTypes) {
         this.sectionTypes = sectionTypes;
+    }
+
+    public ArrayList<String> getRequiredSections() {
+        return requiredSections;
+    }
+
+    public void setRequiredSections(ArrayList<String> requiredSections) {
+        this.requiredSections = requiredSections;
     }
 }

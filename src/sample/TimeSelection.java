@@ -293,6 +293,9 @@ public class TimeSelection {
             public boolean filter(Section section) {
                 boolean fits = true;
                 for (int d=0; d < 5; d++) {
+                    if (section.getDaysOfTheWeek() == null) {
+                        return false;
+                    }
                     if (section.getDaysOfTheWeek().contains(Section.daysAbbr[d])) {
                         int startRow = getHalfHours(section.getStartTime());
                         int endRow = getHalfHours(section.getEndTime());
@@ -305,6 +308,33 @@ public class TimeSelection {
                 //System.out.println("True/False: " + fits);
                 return fits;
             }
+            @Override
+            public CourseSectionFilter copy() {
+                return new CourseSectionFilter() {
+                    @Override
+                    public boolean filter(Section section) {
+                        boolean fits = true;
+                        for (int d=0; d < 5; d++) {
+                            if (section.getDaysOfTheWeek() == null) {
+                                return false;
+                            }
+                            if (section.getDaysOfTheWeek().contains(Section.daysAbbr[d])) {
+                                int startRow = getHalfHours(section.getStartTime());
+                                int endRow = getHalfHours(section.getEndTime());
+                                for (int r=startRow; r<=endRow; r++) {
+                                    fits = fits && cells[r][d]; //fits becomes false if any of the cells are false.
+                                }
+                            }
+                        }
+                        return fits;
+                    }
+
+                    @Override
+                    public CourseSectionFilter copy() {
+                        return null;
+                    }
+                };
+            };
         };
     }
 

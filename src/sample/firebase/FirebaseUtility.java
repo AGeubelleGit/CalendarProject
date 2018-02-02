@@ -4,6 +4,7 @@ import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.database.*;
+import sample.schedule.GenEdCategories;
 
 import java.io.FileInputStream;
 import java.util.HashMap;
@@ -42,18 +43,16 @@ public class FirebaseUtility {
         return database.getReference("departments/" + departmentAbbr);
     }
 
-    public static void addSingleListener(DatabaseReference ref) {
-        ref.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+    public static DatabaseReference getCourseReference(String departmentAbbr, String courseAbbr) {
+        return database.getReference("departments/" + departmentAbbr + "/" + courseAbbr);
+    }
 
-            }
+    public static DatabaseReference getGenEdListReference() {
+        return database.getReference("gen_ed_courses");
+    }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
+    public static DatabaseReference getGenEdListReference(GenEdCategories category) {
+        return database.getReference("gen_ed_courses/" + category.name());
     }
 
 }

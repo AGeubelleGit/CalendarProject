@@ -6,6 +6,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -24,6 +25,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.util.Pair;
 import sample.firebase.FirebaseUtility;
 import sample.schedule.Course;
+import sample.schedule.GenEdCategories;
 import sample.schedule.Section;
 
 import java.util.ArrayList;
@@ -276,7 +278,18 @@ public class InputCourses {
             }
         });
 
-        actionButtonsHBox.getChildren().addAll(scheduleButton);
+        Button testButton = new Button("Test");
+        testButton.setPrefHeight(35);
+        testButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                GenEdCourseFinder finder = new GenEdCourseFinder(null, GenEdCategories.HUM, filter);
+                new Thread(()->finder.run()).start();
+//                finder.run();
+            }
+        });
+
+        actionButtonsHBox.getChildren().addAll(testButton, scheduleButton);
 
         // The vert labout is just a verticle container for the three main components.
         vertLayout.getChildren().addAll(actionButtonsHBox, courseDropdownSelection, sectionsListScroller);
@@ -310,6 +323,7 @@ public class InputCourses {
     private static void setSectionList(String dept, String course) {
         //Course selectedCourse = courses.get(dept).get(course);
         Course selectedCourse = currDep.get(course);
+        System.out.println(selectedCourse);
         if (selectedCourse != null) {
             setSectionList(selectedCourse);
         }
@@ -416,6 +430,13 @@ public class InputCourses {
             sectionsArray[i] = shownSections.get(i);
         }
         shownCourse.setSections(sectionsArray);
+    }
+
+    public static void displayPossibleCourses(ArrayList<Course> genEdCourses) {
+        sectionsListVBox.getChildren().clear();
+        for (Course course: genEdCourses) {
+            sectionsListVBox.getChildren().add(new Label(course.getName()));
+        }
     }
 
     /**
