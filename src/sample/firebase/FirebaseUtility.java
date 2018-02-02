@@ -31,10 +31,14 @@ public class FirebaseUtility {
     }
 
     public static DatabaseReference getDepartmentNamesReference() {
-        return database.getReference("department_names");
+        if (database == null) {
+            return null;
+        } else {
+            return database.getReference("department_names");
+        }
     }
 
-    public static DatabaseReference getDepartmentJson(String departmentAbbr) {
+    public static DatabaseReference getDepartmentReference(String departmentAbbr) {
         return database.getReference("departments/" + departmentAbbr);
     }
 

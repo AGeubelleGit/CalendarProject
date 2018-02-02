@@ -18,6 +18,9 @@ public class Course {
     @SerializedName("gen_ed_categories")
     private String[] genEdReqs;
 
+    @SerializedName("section_types")
+    private String[] sectionTypes;
+
     @SerializedName("section_list")
     private Section[] sections;
 
@@ -78,5 +81,13 @@ public class Course {
 
     public void setSections(Section[] sections) {
         this.sections = sections;
+    }
+
+    public String[] getSectionTypes() {
+        return sectionTypes;
+    }
+
+    public void setSectionTypes(String[] sectionTypes) {
+        this.sectionTypes = sectionTypes;
     }
 }

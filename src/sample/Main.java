@@ -16,6 +16,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.util.Pair;
+import sample.firebase.FirebaseUtility;
 import sample.schedule.Course;
 import sample.schedule.Section;
 
@@ -42,6 +43,7 @@ public class Main extends Application {
         String filePath = "/Users/alexandregeubelle/Downloads/CalendarProject/src/sample/schedule_info.json";
         courses = JsonParser.getCourses(filePath);
 
+        FirebaseUtility.initialize();
         ScheduleInfo.initialize(main);
         InputCourses.initialize(main, courses);
         TimeSelection.initialize(main);
@@ -60,7 +62,14 @@ public class Main extends Application {
     }
 
     public void setSceneInputCourses(CourseSectionFilter filter) {
-        InputCourses.setFilter(filter);
+        //InputCourses.setFilter(filter);
+        InputCourses.resetScene(filter); //Not supposed to be here
+        Scene inputScene = InputCourses.getScene();
+        setScene(inputScene);
+        window.setTitle("Add Course");
+    }
+
+    public void setSceneInputCoursesTest() {
         Scene inputScene = InputCourses.getScene();
         setScene(inputScene);
         window.setTitle("Add Course");

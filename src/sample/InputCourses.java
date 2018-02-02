@@ -1,5 +1,11 @@
 package sample;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -9,12 +15,14 @@ import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Pair;
+import sample.firebase.FirebaseUtility;
 import sample.schedule.Course;
 import sample.schedule.Section;
 
@@ -46,6 +54,18 @@ public class InputCourses {
     private static final String allSectionDaysString = "All";
     private static String[] daysAndAll = null;
 
+    private static ArrayList<String> departmentNames;
+    private static DatabaseReference ref;
+    private static ObservableList<String> options = null;
+    private static ObservableList<String> courseInDep = null;
+    private static VBox vertLayout;
+    private static Pane pane;
+    private static ComboBox departmentDropdown;
+    private static ComboBox coursesDropdown;
+    private static boolean updateReq;
+
+    private static HashMap<String, Course> currDep;
+
     private static HashMap<String, HashMap<String, Course>> courses;
 
     /**
@@ -69,6 +89,37 @@ public class InputCourses {
             daysAndAll[d] = Section.daysAbbr[d - 1];
         }
 
+        departmentNames = new ArrayList<>();
+
+        // The vert layout holds the three main parts of the screen
+        vertLayout = new VBox();
+        vertLayout.setSpacing(5);
+
+        updateReq = false;
+        ref = FirebaseUtility.getDepartmentNamesReference();
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                HashMap depMap = (HashMap<String, String>) dataSnapshot.getValue();
+                departmentNames = new ArrayList<>(depMap.values());
+                System.out.println(departmentNames);
+                Collections.sort(departmentNames);
+                options = FXCollections.observableArrayList(departmentNames);
+                System.out.println("TEST");
+                updateReq = true;
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                System.out.println("Canceled");
+            }
+        });
+
+        departmentDropdown = new ComboBox(null);
+        coursesDropdown = new ComboBox(null);
+        pane = new Pane(vertLayout);
+        scene = new Scene(pane, windowWidth, 550);
+
         // Create the scene using resetScene.
         scene = resetScene(null);
     }
@@ -83,9 +134,7 @@ public class InputCourses {
 
         shownCourse = null;
 
-        // The vert layout holds the three main parts of the screen
-        VBox vertLayout = new VBox();
-        vertLayout.setSpacing(5);
+        vertLayout.getChildren().clear();
 
         // This VBox will hold the list of all the sections for the selected course as information about the course.
         sectionsListVBox = new VBox();
@@ -103,36 +152,72 @@ public class InputCourses {
         courseDropdownSelection.setSpacing(10);
 
         // A list of department names which will be the values in the first dropdown.
-        ArrayList<String> departmentNames = new ArrayList<String>(courses.keySet());
-        Collections.sort(departmentNames);
-        ObservableList<String> options =
-                FXCollections.observableArrayList(departmentNames);
-
-        // The dropdown that shows all the different departments.
-        ComboBox departmentDropdown = new ComboBox(options);
+        departmentDropdown = new ComboBox(options);
         departmentDropdown.setPrefWidth(300);
         departmentDropdown.setPrefHeight(50);
         departmentDropdown.setPromptText("Choose Department");
 
         // The dropdown that will show all the courses in the selected department.
-        ComboBox coursesDropdown = new ComboBox();
+        coursesDropdown = new ComboBox();
         coursesDropdown.setPrefWidth(300);
         coursesDropdown.setPrefHeight(50);
         coursesDropdown.setPromptText("Choose Course");
 
+        if (currDep != null) {
+            ArrayList<String> courseNames = new ArrayList<String>(currDep.keySet());
+            Collections.sort(courseNames);
+            coursesDropdown.setItems(FXCollections.observableArrayList(courseNames));
+        }
+
         // When the department is changed, update the keys in the courses dropdown to be all the courses in said dept.
+        departmentDropdown.setOnMousePressed(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                if (updateReq) {
+                    updateReq = false;
+                    departmentDropdown.setItems(options);
+                }
+            }
+        });
         departmentDropdown.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
                 savedDeptString = departmentDropdown.getValue().toString();
-                ArrayList<String> courseNames = new ArrayList<String>(courses.get(savedDeptString).keySet());
-                Collections.sort(courseNames);
-                coursesDropdown.setItems(FXCollections.observableArrayList(courseNames));
+
+                //TESTING
+                ref = FirebaseUtility.getDepartmentReference(savedDeptString);
+                ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        String json = dataSnapshot.getValue().toString();
+                        Gson gson = new Gson();
+                        currDep = gson.fromJson(json, new TypeToken<HashMap<String, Course>>() {}.getType() );
+                        ArrayList<String> courses = new ArrayList<>(currDep.keySet());
+                        Collections.sort(courses);
+                        courseInDep = FXCollections.observableArrayList(courses);
+                        updateReq = true;
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        System.out.println("Canceled");
+                    }
+                });
+
             }
         });
 
         // When the user chooses a specific course, save the values for the dept and course.
         // Then reset the day/type filters and finally, set the list of sections.
+        coursesDropdown.setOnMousePressed(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                if (updateReq) {
+                    updateReq = false;
+                    coursesDropdown.setItems(courseInDep);
+                }
+            }
+        });
         coursesDropdown.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -196,9 +281,6 @@ public class InputCourses {
         // The vert labout is just a verticle container for the three main components.
         vertLayout.getChildren().addAll(actionButtonsHBox, courseDropdownSelection, sectionsListScroller);
 
-        // Set the value of our "scene" variable to be a new scene.
-        Pane pane = new Pane(vertLayout);
-        scene = new Scene(pane, windowWidth, 550);
         return scene;
     }
 
@@ -226,7 +308,8 @@ public class InputCourses {
 
     // Set the section list to display information about a specific course.
     private static void setSectionList(String dept, String course) {
-        Course selectedCourse = courses.get(dept).get(course);
+        //Course selectedCourse = courses.get(dept).get(course);
+        Course selectedCourse = currDep.get(course);
         if (selectedCourse != null) {
             setSectionList(selectedCourse);
         }
