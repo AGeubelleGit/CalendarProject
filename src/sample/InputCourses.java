@@ -241,7 +241,7 @@ public class InputCourses {
         toTimeSelectionButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                main.setSceneTimeSelection();
+                main.setSceneTimeSelection(UIScene.INPUT_COURSES);
             }
         });
 
@@ -280,12 +280,18 @@ public class InputCourses {
 
         Button testButton = new Button("Test");
         testButton.setPrefHeight(35);
+//        testButton.setOnAction(new EventHandler<ActionEvent>() {
+//            @Override
+//            public void handle(ActionEvent event) {
+//                GenEdCourseFinder finder = new GenEdCourseFinder(null, GenEdCategories.HUM, filter);
+//                new Thread(()->finder.run()).start();
+////                finder.run();
+//            }
+//        });
         testButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                GenEdCourseFinder finder = new GenEdCourseFinder(null, GenEdCategories.HUM, filter);
-                new Thread(()->finder.run()).start();
-//                finder.run();
+                main.setSceneGenEdScene();
             }
         });
 

@@ -60,6 +60,8 @@ public class ScheduleInfo {
 
     // Initialize the variables in this class.
     public static void initialize(Main mainInstance) {
+        currCourses = JsonParser.loadSaved("saved.json");
+
         main = mainInstance;
 
         minimzeList = false;
@@ -170,8 +172,17 @@ public class ScheduleInfo {
             }
         });
 
+        Button saveButton = new Button("Save");
+        saveButton.setPrefHeight(35);
+        saveButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                JsonParser.saveCourses("saved.json", currCourses);
+            }
+        });
+
         // Set the children of the menu and return it.
-        menu.getChildren().addAll(title, findCoursesButton, zoomLabel, zoomInButton, zoomOutButton);
+        menu.getChildren().addAll(title, findCoursesButton, zoomLabel, zoomInButton, zoomOutButton, saveButton);
         return menu;
     }
 

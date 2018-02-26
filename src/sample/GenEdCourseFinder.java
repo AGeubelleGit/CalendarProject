@@ -100,7 +100,7 @@ public class GenEdCourseFinder {
             Platform.runLater(new Runnable() {
                 @Override
                 public void run() {
-                    InputCourses.displayPossibleCourses(possibleCourses);
+                    FindGenEdCoursesUI.displayPossibleCourses(possibleCourses);
                 }
             });
         }

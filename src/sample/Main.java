@@ -47,6 +47,7 @@ public class Main extends Application {
         ScheduleInfo.initialize(main);
         InputCourses.initialize(main, courses);
         TimeSelection.initialize(main);
+        FindGenEdCoursesUI.initialize(main);
 
         setSceneInputCourses();
         window.show();
@@ -81,10 +82,20 @@ public class Main extends Application {
         window.setTitle("Your Schedule");
     }
 
-    public void setSceneTimeSelection() {
-        Scene timeSelectionScene = TimeSelection.createTimeSelectionScene();
+    public void setSceneTimeSelection(UIScene fromScene) {
+        Scene timeSelectionScene = TimeSelection.createTimeSelectionScene(fromScene);
         setScene(timeSelectionScene);
         window.setTitle("Choose Time Frame");
+    }
+
+    public void setSceneGenEdScene() {
+        setSceneGenEdScene(null);
+    }
+
+    public void setSceneGenEdScene(CourseSectionFilter filter) {
+        Scene genEdScene = FindGenEdCoursesUI.resetScene(filter);
+        setScene(genEdScene);
+        window.setTitle("Gen Ed Courses");
     }
 
     public double getWindowWidth() {

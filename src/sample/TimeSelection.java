@@ -49,17 +49,23 @@ public class TimeSelection {
     private static int realWidth = width-(width_split*2);
     private static int time_width = 75;
 
+    private static UIScene callerScene;
+
     public static void initialize(Main inputMain) {
         main = inputMain;
 
         vBox = new VBox();
         retScene = new Scene(vBox);
 
+        callerScene = UIScene.INPUT_COURSES;
+
         cells = new boolean[48][5];
         setAllCellsToValue(false, false);
     }
 
-    public static Scene createTimeSelectionScene() {
+    public static Scene createTimeSelectionScene(UIScene inputCallerScene) {
+        callerScene = inputCallerScene;
+
         startDrag = null;
         endDrag = null;
         cellRects = new Rectangle[48][5];
@@ -139,7 +145,12 @@ public class TimeSelection {
         cancelButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                main.setSceneInputCourses();
+                if (callerScene == UIScene.INPUT_COURSES) {
+                    main.setSceneInputCourses();
+                } else if (callerScene == UIScene.GEN_ED_FINDER) {
+                    main.setSceneGenEdScene(null);
+                }
+
             }
         });
 
@@ -166,7 +177,11 @@ public class TimeSelection {
         submitButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                main.setSceneInputCourses(createFilter());
+                if (callerScene == UIScene.INPUT_COURSES) {
+                    main.setSceneInputCourses(createFilter());
+                } else if (callerScene == UIScene.GEN_ED_FINDER) {
+                    main.setSceneGenEdScene(createFilter());
+                }
             }
         });
 
@@ -190,7 +205,7 @@ public class TimeSelection {
             public void handle(ActionEvent event) {
                 height = Integer.min(height+zoomAmount, maxHeight);
                 realHeight = height-(height_split*2);
-                main.setSceneTimeSelection();
+                main.setSceneTimeSelection(callerScene);
             }
         });
 
@@ -201,7 +216,7 @@ public class TimeSelection {
             public void handle(ActionEvent event) {
                 height = Integer.max(height-zoomAmount, minHeight);
                 realHeight = height-(height_split*2);
-                main.setSceneTimeSelection();
+                main.setSceneTimeSelection(callerScene);
             }
         });
 

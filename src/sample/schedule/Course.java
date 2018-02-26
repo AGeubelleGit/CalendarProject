@@ -55,6 +55,21 @@ public class Course {
                 '}';
     }
 
+    public String sectionTypesToString() {
+        if (sectionTypes.length > 0) {
+            StringBuilder output = new StringBuilder();
+            for (int i = 0; i < sectionTypes.length - 1; i++) {
+                String type = sectionTypes[i];
+                output.append(type);
+                output.append(", ");
+            }
+            output.append(sectionTypes[sectionTypes.length-1]);
+            return output.toString();
+        }else{
+            return "None.";
+        }
+    }
+
     public String getName() {
         return name;
     }
