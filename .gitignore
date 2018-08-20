@@ -1,0 +1,9 @@
+# IDE
+.idea*
+*.idea*
+
+*__pycache__*
+
+
+# Config files:
+*firebase_config.json
