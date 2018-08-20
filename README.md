@@ -13,3 +13,7 @@ The calendar application is in java, using javafx.
 * Find sections that do not conflict with current courses
 
 ### Images
+Calendar View<br/>
+![Calendar View](Images/CalendarScreenshot.png?raw=true)<br/>
+Course Selection<br/>
+![Course Selection View](Images/CourseSelectionScreenshot.png?raw=true)<br/>
