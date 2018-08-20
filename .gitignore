@@ -1,9 +1,10 @@
 # IDE
-.idea*
+.idea
 *.idea*
 
 *__pycache__*
 
 
 # Config files:
-*firebase_config.json
+*firebase_config.json*
+*uiucscheduledatabase-firebase-adminsdk-12s6b-3fcd281eb7.json*
